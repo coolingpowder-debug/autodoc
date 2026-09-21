@@ -32,7 +32,7 @@ else:
         with st.form("doc_form"):
             st.subheader("📌 ข้อมูลสำหรับร่างบันทึกข้อความ")
 
-            # ช่องอัปโหลดไฟล์หนังสือต้นเรื่อง (PDF หรือรูปภาพ)
+            # ช่องอัปโหลดไฟล์หนังสือต้นเรื่อง (PDF หรือ รูปภาพ)
             uploaded_file = st.file_uploader(
                 "📂 อัปโหลดหนังสือต้นเรื่อง (PDF หรือ รูปภาพ สำหรับให้ AI อ่านและวิเคราะห์โต้ตอบ)",
                 type=["pdf", "png", "jpg", "jpeg"],
@@ -69,16 +69,14 @@ else:
             with st.spinner("AI กำลังอ่านเอกสารและเรียบเรียงเนื้อหาตามหลักสารบรรณ..."):
                 contents = []
 
-                # จัดการไฟล์ที่อัปโหลด (ถ้ามี)
+                # จัดการไฟล์ที่อัปโหลด (แปลงเป็น Part สำหรับ SDK ใหม่)
                 if uploaded_file is not None:
                     file_bytes = uploaded_file.getvalue()
                     mime_type = uploaded_file.type
-                    contents.append(
-                        {
-                            "data": file_bytes,
-                            "mime_type": mime_type,
-                        }
+                    file_part = genai.types.Part.from_bytes(
+                        data=file_bytes, mime_type=mime_type
                     )
+                    contents.append(file_part)
 
                 prompt = f"""
                 คุณเป็นผู้เชี่ยวชาญด้านงานสารบรรณราชการไทย 
