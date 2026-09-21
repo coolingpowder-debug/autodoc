@@ -1,7 +1,7 @@
 import streamlit as st
 from google import genai
 
-# ตั้งค่าหน้าเว็บ (แก้ไขคำสั่งให้ถูกต้อง)
+# ตั้งค่าหน้าเว็บ
 st.set_page_config(
     page_title="ระบบช่วยเขียนบันทึกข้อความราชการอัจฉริยะ",
     page_icon="📝",
@@ -14,17 +14,20 @@ st.markdown(
     " ตามระเบียบงานสารบรรณ"
 )
 
-# Sidebar สำหรับใส่ API Key
-st.sidebar.header("🔑 ตั้งค่าระบบ")
-api_key_input = st.sidebar.text_input(
-    "Google Gemini API Key", type="password", help="ใส่ API Key ของคุณที่นี่"
-)
+# ดึง API Key จาก Secrets ของระบบ (ซ่อนไม่ให้คนอื่นเห็น)
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    api_key = None
 
-if not api_key_input:
-    st.warning("⚠️ กรุณากรอก Google Gemini API Key ในแถบด้านข้างซ้ายเพื่อเริ่มใช้งาน")
+if not api_key:
+    st.error(
+        "⚠️ ยังไม่ได้ตั้งค่า GEMINI_API_KEY ใน Streamlit Secrets"
+        " กรุณาตั้งค่าก่อนใช้งาน"
+    )
 else:
     try:
-        client = genai.Client(api_key=api_key_input)
+        client = genai.Client(api_key=api_key)
 
         # ฟอร์มรับข้อมูล
         with st.form("doc_form"):
@@ -50,7 +53,16 @@ else:
                     "ใส่ข้อมูลดิบ เช่น กำหนดการ งบประมาณ"
                     " หรือปัญหาที่พบ..."
                 ),
-                height=150,
+                height=120,
+            )
+
+            doc_reference = st.text_area(
+                "📄 ข้อความจากหนังสือต้นเรื่อง / เอกสารอ้างอิง (ถ้ามี)",
+                placeholder=(
+                    "คัดลอกข้อความจากหนังสือต้นเรื่องมาวางที่นี่"
+                    " เพื่อให้ AI ช่วยตอบกลับหรืออ้างอิง..."
+                ),
+                height=120,
             )
 
             submitted = st.form_submit_button(
@@ -58,8 +70,8 @@ else:
             )
 
         if submitted:
-            if not doc_details:
-                st.error("⚠️ กรุณากรอกรายละเอียดหรือข้อมูลดิบก่อนกดสังเคราะห์")
+            if not doc_details and not doc_reference:
+                st.error("⚠️ กรุณากรอกรายละเอียด หรือข้อมูลจากหนังสือต้นเรื่องอย่างน้อย 1 ช่อง")
             else:
                 with st.spinner("AI กำลังเรียบเรียงเนื้อหาตามหลักสารบรรณ..."):
                     prompt = f"""
@@ -70,9 +82,10 @@ else:
                     - เรื่อง: {doc_subject}
                     - วัตถุประสงค์: {doc_objective}
                     - รายละเอียด/ข้อมูลดิบ: {doc_details}
+                    - ข้อมูลจากหนังสือต้นเรื่อง/อ้างอิง: {doc_reference}
 
                     โดยแบ่งโครงสร้างออกเป็น 3 ส่วนชัดเจนตามหลักสารบรรณ:
-                    1. ภาคเหตุ (ที่มาและปัญหา)
+                    1. ภาคเหตุ (ที่มาและปัญหา หรืออ้างอิงหนังสือต้นเรื่อง)
                     2. ภาคความประสงค์ (สิ่งที่ต้องการให้ดำเนินการ หรือขออนุมัติอะไร)
                     3. ภาคสรุป (ข้อเสนอเพื่อพิจารณาอนุมัติ/โปรดพิจารณา)
                     
