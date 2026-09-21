@@ -97,7 +97,7 @@ else:
                 contents.append(prompt)
 
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash", contents=contents
+                    model="gemini-3.6-flash", contents=contents
                 )
 
                 st.success("✅ ร่างบันทึกข้อความเสร็จเรียบร้อย!")
