@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# ตกแต่ง CSS เพิ่มความสวยงาม เรียบร้อย และจัดแต่งส่วนท้าย (Footer)
+# ตกแต่ง CSS เพิ่มความสวยงาม เรียบร้อย
 st.markdown(
     """
     <style>
@@ -282,19 +282,14 @@ with tab2:
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
 
-# --- ส่วนท้าย (Footer) พร้อม QR Code ขนาด 1x1 ซม. และข้อมูลผู้พัฒนา ---
+# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code ---
 st.markdown("---")
-col_f1, col_f2 = st.columns([4, 1])
+st.markdown("#### 🛠️ ข้อมูลผู้พัฒนาระบบ")
+st.markdown("**สร้างและพัฒนาโดย:** Admin Mine")
+st.markdown("ช่องทางติดต่อ (ตาม QR code ที่แนบ)")
 
-with col_f1:
-    st.markdown("#### 🛠️ ข้อมูลผู้พัฒนาระบบ")
-    st.markdown("**สร้างและพัฒนาโดย:** Admin Mine")
-    st.markdown("📧 **Email ติดต่อ:** admin.mine@domain.go.th *(หรือสแกน QR Code ด้านข้างเพื่อติดต่อ)*")
-
-with col_f2:
-    # ปรับขนาด QR Code ให้เล็กลงเหลือ 45 พิกเซล (ประมาณ 1x1 ซม.)
-    st.image(
-        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150", 
-        caption="สแกนติดต่อ", 
-        width=45
-    )
+# แสดงภาพ QR Code จริงขนาด 1x1 ซม. (กว้างประมาณ 45 พิกเซล) ไว้ใต้ข้อความ
+st.image(
+    "https://storage.googleapis.com/gcs-public-data-file/chats/2157685729546836844941733587931278924/2161961034651059158450334719761293344/15aaa62fc4b84305/user/f3148da1-bc2b-472f-b28b-50828476f0a6/co-01a0c72e-fbd8-78d8-9d02-0bef1567fd8c-md.txt",
+    width=45
+)
