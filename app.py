@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# ตกแต่ง CSS เพิ่มความสวยงามให้แดชบอร์ดและการ์ดสถิติ
+# ตกแต่ง CSS เพิ่มความสวยงาม เรียบร้อย และจัดแต่งส่วนท้าย (Footer)
 st.markdown(
     """
     <style>
@@ -37,7 +37,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ใช้ st.session_state และ st.session_state.get เพื่อให้สถิติคงอยู่ถาวรไม่รีเซตเมื่อเปลี่ยนแท็บ
+# ใช้ st.session_state เพื่อเก็บประวัติและสถิติแบบสะสมต่อเนื่องไม่รีเซต
 if "history" not in st.session_state:
     st.session_state.history = []
 
@@ -172,7 +172,6 @@ with tab1:
                         result_text = response.text
                         current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                         
-                        # ทำความสะอาดหัวข้อเรื่องโดยการปกปิด/ตัดชื่อส่วนราชการที่ติดมาออกให้เป็นกลาง
                         clean_subject = re.sub(r'^(กอง|สำนักงาน|กรม|ฝ่าย|กลุ่มงาน|สำนัก)[^\s]*\s*', '', doc_subject).strip()
                         if not clean_subject:
                             clean_subject = doc_subject
@@ -206,7 +205,6 @@ with tab2:
     total_external = sum(1 for item in st.session_state.history if "ภายนอก" in item["doc_type"])
     total_with_file = sum(1 for item in st.session_state.history if item["has_file"])
 
-    # แสดงการ์ดสถิติ 4 ช่อง (รวมทั้งหมด, หนังสือภายใน, หนังสือภายนอก, มีไฟล์แนบ)
     col_s1, col_s2, col_s3, col_s4 = st.columns(4)
     with col_s1:
         st.markdown(
@@ -262,7 +260,7 @@ with tab2:
                 {
                     "ลำดับ": idx,
                     "ประเภทหนังสือ": item["doc_type"],
-                    "หัวเรื่องหนังสือที่ AI สร้างให้ (ปกปิดส่วนราชการ)": item["subject"],
+                    "ข้อความหัวเรื่องที่ระบบสร้างให้ (ปกปิดส่วนราชการ)": item["subject"],
                     "สถานะอัพโหลดหนังสือให้วิเคราะห์เนื้อหา": status_badge,
                     "วันที่สร้าง": item["date"],
                 }
@@ -283,3 +281,20 @@ with tab2:
             st.markdown(f"**หัวเรื่อง:** {selected_item['subject']}")
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
+
+# --- ส่วนท้าย (Footer) พร้อม QR Code ขนาด 1x1 ซม. และข้อมูลผู้พัฒนา ---
+st.markdown("---")
+col_f1, col_f2 = st.columns([4, 1])
+
+with col_f1:
+    st.markdown("#### 🛠️ ข้อมูลผู้พัฒนาระบบ")
+    st.markdown("**สร้างและพัฒนาโดย:** Admin Mine")
+    st.markdown("📧 **Email ติดต่อ:** admin.mine@domain.go.th *(หรือสแกน QR Code ด้านข้างเพื่อติดต่อ)*")
+
+with col_f2:
+    # ปรับขนาด QR Code ให้เล็กลงเหลือ 45 พิกเซล (ประมาณ 1x1 ซม.)
+    st.image(
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150", 
+        caption="สแกนติดต่อ", 
+        width=45
+    )
