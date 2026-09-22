@@ -2,7 +2,6 @@ import streamlit as st
 from google import genai
 import datetime
 import re
-import urllib.parse
 
 # ตั้งค่าหน้าเว็บ
 st.set_page_config(
@@ -283,23 +282,11 @@ with tab2:
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
 
-# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนา และอีเมลแบบคลิกดูเต็มๆ ---
+# --- ส่วนท้าย (Footer) ข้อความตามกำหนด พร้อมระบบคลิกดูอีเมลเต็ม ---
 st.markdown("---")
 st.markdown("🛠️ **สร้างและพัฒนาโดย:** Admin Mine")
 
-col_f1, col_f2 = st.columns([1, 6])
-with col_f1:
-    st.markdown("**ช่องทางติดต่อ >>**")
-with col_f2:
-    # ใช้ st.expander เพื่อให้ผู้ใช้คลิก 1 ครั้งเพื่อเปิดดูอีเมลทั้งหมดได้
-    with st.expander("📧 คลิกเพื่อดูอีเมลติดต่อฉบับเต็ม"):
-        contact_email = "admin.mine@domain.go.th"
-        st.markdown(f"อีเมลผู้พัฒนา: `{contact_email}`")
-        st.markdown(f"🔗 ส่งอีเมลโดยตรง: [คลิกที่นี่เพื่อส่งอีเมล](mailto:{contact_email})")
-    
-    # QR Code เชื่อมโยงไปที่อีเมลเช่นเดิม
-    contact_email = "admin.mine@domain.go.th"
-    mailto_url = f"mailto:{contact_email}"
-    encoded_mailto = urllib.parse.quote(mailto_url, safe='')
-    qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={encoded_mailto}"
-    st.image(qr_api_url, width=45)
+with st.expander("ช่องทางติดต่อ: ad***@domain.go.th (คลิกเพื่อดูอีเมลทั้งหมด)"):
+    full_email = "admin.mine@domain.go.th"
+    st.markdown(f"📧 **อีเมลติดต่อ:** `{full_email}`")
+    st.markdown(f"🔗 [คลิกที่นี่เพื่อส่งอีเมลหาผู้พัฒนา](mailto:{full_email})")
