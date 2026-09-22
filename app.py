@@ -282,14 +282,16 @@ with tab2:
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
 
-# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code ---
+# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code เรียงบรรทัดเดียวกัน ---
 st.markdown("---")
-st.markdown("#### 🛠️ ข้อมูลผู้พัฒนาระบบ")
-st.markdown("**สร้างและพัฒนาโดย:** Admin Mine")
-st.markdown("ช่องทางติดต่อ (ตาม QR code ที่แนบ)")
+st.markdown("🛠️ **สร้างและพัฒนาโดย:** Admin Mine")
 
-# แสดงภาพ QR Code จริงขนาด 1x1 ซม. (กว้างประมาณ 45 พิกเซล) ไว้ใต้ข้อความ
-st.image(
-    "https://storage.googleapis.com/gcs-public-data-file/chats/2157685729546836844941733587931278924/2161961034651059158450334719761293344/15aaa62fc4b84305/user/f3148da1-bc2b-472f-b28b-50828476f0a6/co-01a0c72e-fbd8-78d8-9d02-0bef1567fd8c-md.txt",
-    width=45
-)
+# ใช้ columns จัดวางข้อความ "ช่องทางติดต่อ >>" กับรูป QR Code ไว้บรรทัดเดียวกัน
+col_f1, col_f2 = st.columns([1, 5])
+with col_f1:
+    st.markdown("**ช่องทางติดต่อ >>**")
+with col_f2:
+    st.image(
+        "https://storage.googleapis.com/gcs-public-data-file/chats/2157685729546836844941733587931278924/2161961034651059158450334719761293344/15aaa62fc4b84305/user/f3148da1-bc2b-472f-b28b-50828476f0a6/co-01a0c72e-fbd8-78d8-9d02-0bef1567fd8c-md.txt",
+        width=45
+    )
