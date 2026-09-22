@@ -279,24 +279,27 @@ with tab2:
         if selected_index:
             selected_item = st.session_state.history[selected_index - 1]
             st.markdown(f"**ประเภท:** {selected_item['doc_type']}")
-            str_sub = selected_item['subject']
-            st.markdown(f"**หัวเรื่อง:** {str_sub}")
+            st.markdown(f"**หัวเรื่อง:** {selected_item['subject']}")
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
 
-# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code ชิดซ้ายติดกัน ---
+# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนา และอีเมลแบบคลิกดูเต็มๆ ---
 st.markdown("---")
 st.markdown("🛠️ **สร้างและพัฒนาโดย:** Admin Mine")
 
-# จัดสัดส่วน Column ให้ชิดซ้ายและแคบลง เพื่อให้ QR Code ขยับมาใกล้คำว่าช่องทางติดต่อมากที่สุด
-col_f1, col_f2, col_f3 = st.columns([1, 1, 6])
+col_f1, col_f2 = st.columns([1, 6])
 with col_f1:
-    st.markdown("**ช่องทางติดต่อ:**")
+    st.markdown("**ช่องทางติดต่อ >>**")
 with col_f2:
+    # ใช้ st.expander เพื่อให้ผู้ใช้คลิก 1 ครั้งเพื่อเปิดดูอีเมลทั้งหมดได้
+    with st.expander("📧 คลิกเพื่อดูอีเมลติดต่อฉบับเต็ม"):
+        contact_email = "admin.mine@domain.go.th"
+        st.markdown(f"อีเมลผู้พัฒนา: `{contact_email}`")
+        st.markdown(f"🔗 ส่งอีเมลโดยตรง: [คลิกที่นี่เพื่อส่งอีเมล](mailto:{contact_email})")
+    
+    # QR Code เชื่อมโยงไปที่อีเมลเช่นเดิม
     contact_email = "admin.mine@domain.go.th"
     mailto_url = f"mailto:{contact_email}"
     encoded_mailto = urllib.parse.quote(mailto_url, safe='')
     qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={encoded_mailto}"
     st.image(qr_api_url, width=45)
-with col_f3:
-    st.empty()
