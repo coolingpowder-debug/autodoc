@@ -282,16 +282,16 @@ with tab2:
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
 
-# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code เรียงบรรทัดเดียวกัน ---
+# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code ---
 st.markdown("---")
 st.markdown("🛠️ **สร้างและพัฒนาโดย:** Admin Mine")
 
-# ใช้ columns จัดวางข้อความ "ช่องทางติดต่อ >>" กับรูป QR Code ไว้บรรทัดเดียวกัน
-col_f1, col_f2 = st.columns([1, 5])
+col_f1, col_f2 = st.columns([1, 6])
 with col_f1:
-    st.markdown("**ช่องทางติดต่อ >>**")
+    st.markdown("**ช่องทางติดต่อ:**")
 with col_f2:
+    # ใช้ลิงก์ภาพ QR Code ตัวอย่างที่โหลดขึ้นแสดงผลได้แน่นอน
     st.image(
-        "https://storage.googleapis.com/gcs-public-data-file/chats/2157685729546836844941733587931278924/2161961034651059158450334719761293344/15aaa62fc4b84305/user/f3148da1-bc2b-472f-b28b-50828476f0a6/co-01a0c72e-fbd8-78d8-9d02-0bef1567fd8c-md.txt",
+        "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=AdminMineContact",
         width=45
     )
