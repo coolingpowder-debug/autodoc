@@ -2,6 +2,7 @@ import streamlit as st
 from google import genai
 import datetime
 import re
+import urllib.parse
 
 # ตั้งค่าหน้าเว็บ
 st.set_page_config(
@@ -278,20 +279,24 @@ with tab2:
         if selected_index:
             selected_item = st.session_state.history[selected_index - 1]
             st.markdown(f"**ประเภท:** {selected_item['doc_type']}")
-            st.markdown(f"**หัวเรื่อง:** {selected_item['subject']}")
+            str_sub = selected_item['subject']
+            st.markdown(f"**หัวเรื่อง:** {str_sub}")
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
 
-# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code ---
+# --- ส่วนท้าย (Footer) ข้อมูลผู้พัฒนาและ QR Code ชิดซ้ายติดกัน ---
 st.markdown("---")
 st.markdown("🛠️ **สร้างและพัฒนาโดย:** Admin Mine")
 
-col_f1, col_f2 = st.columns([1, 6])
+# จัดสัดส่วน Column ให้ชิดซ้ายและแคบลง เพื่อให้ QR Code ขยับมาใกล้คำว่าช่องทางติดต่อมากที่สุด
+col_f1, col_f2, col_f3 = st.columns([1, 1, 6])
 with col_f1:
     st.markdown("**ช่องทางติดต่อ:**")
 with col_f2:
-    # ใช้ลิงก์ภาพ QR Code ตัวอย่างที่โหลดขึ้นแสดงผลได้แน่นอน
-    st.image(
-        "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=AdminMineContact",
-        width=45
-    )
+    contact_email = "admin.mine@domain.go.th"
+    mailto_url = f"mailto:{contact_email}"
+    encoded_mailto = urllib.parse.quote(mailto_url, safe='')
+    qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={encoded_mailto}"
+    st.image(qr_api_url, width=45)
+with col_f3:
+    st.empty()
