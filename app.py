@@ -286,7 +286,7 @@ with tab2:
 st.markdown("---")
 st.markdown("🛠️ **สร้างและพัฒนาโดย:** Admin Mine")
 
-with st.expander("ช่องทางติดต่อ: ad***@domain.go.th (คลิกเพื่อดูอีเมลทั้งหมด)"):
-    full_email = "admin.mine@domain.go.th"
+with st.expander("ช่องทางติดต่อ: cool***@gmail.com (คลิกเพื่อดูอีเมลทั้งหมด)"):
+    full_email = "coolingpowder@gmail"
     st.markdown(f"📧 **อีเมลติดต่อ:** `{full_email}`")
     st.markdown(f"🔗 [คลิกที่นี่เพื่อส่งอีเมลหาผู้พัฒนา](mailto:{full_email})")
