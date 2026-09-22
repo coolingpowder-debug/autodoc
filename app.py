@@ -1,6 +1,7 @@
 import streamlit as st
 from google import genai
 import datetime
+import re
 
 # ตั้งค่าหน้าเว็บ
 st.set_page_config(
@@ -36,7 +37,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ใช้ st.session_state เพื่อเก็บบันทึกประวัติ
+# ใช้ st.session_state และ st.session_state.get เพื่อให้สถิติคงอยู่ถาวรไม่รีเซตเมื่อเปลี่ยนแท็บ
 if "history" not in st.session_state:
     st.session_state.history = []
 
@@ -91,7 +92,6 @@ with tab1:
                     doc_from = st.text_input("จาก / ผู้ลงนาม (สำหรับหนังสือภายนอกระบุชื่อตำแหน่ง)", "ปลัด... / อธิบดี...")
                     doc_subject = st.text_input("เรื่อง", "ขออนุมัติ... / ขอความอนุเคราะห์...")
 
-                # ฟิลด์เพิ่มเติมเฉพาะหนังสือภายนอก
                 doc_ref = st.text_input("อ้างถึง (ถ้ามี เช่น หนังสือเดิมที่เคยติดต่อ)", "")
                 doc_materials = st.text_input("สิ่งที่ส่งมาด้วย (ถ้ามี เช่น เอกสารประกอบ 1 ชุด)", "")
 
@@ -119,7 +119,6 @@ with tab1:
                             )
                             contents.append(file_part)
 
-                        # ปรับ Prompt ตามประเภทหนังสือตามฟอร์มทางการ
                         if doc_type == "หนังสือภายใน (บันทึกข้อความ)":
                             form_structure = f"""
                             ประเภท: หนังสือภายใน (บันทึกข้อความ)
@@ -173,11 +172,16 @@ with tab1:
                         result_text = response.text
                         current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                         
-                        display_subject = f"[{doc_type.split()[0]}] {doc_subject}"
+                        # ทำความสะอาดหัวข้อเรื่องโดยการปกปิด/ตัดชื่อส่วนราชการที่ติดมาออกให้เป็นกลาง
+                        clean_subject = re.sub(r'^(กอง|สำนักงาน|กรม|ฝ่าย|กลุ่มงาน|สำนัก)[^\s]*\s*', '', doc_subject).strip()
+                        if not clean_subject:
+                            clean_subject = doc_subject
+
                         st.session_state.history.insert(
                             0,
                             {
-                                "subject": display_subject,
+                                "doc_type": doc_type,
+                                "subject": clean_subject,
                                 "has_file": has_file,
                                 "date": current_date,
                                 "content": result_text,
@@ -198,16 +202,18 @@ with tab2:
     st.subheader("📊 แดชบอร์ดสรุปสถิติและประวัติการสร้างหนังสือ")
     
     total_docs = len(st.session_state.history)
+    total_internal = sum(1 for item in st.session_state.history if "ภายใน" in item["doc_type"])
+    total_external = sum(1 for item in st.session_state.history if "ภายนอก" in item["doc_type"])
     total_with_file = sum(1 for item in st.session_state.history if item["has_file"])
-    total_without_file = total_docs - total_with_file
 
-    col_s1, col_s2, col_s3 = st.columns(3)
+    # แสดงการ์ดสถิติ 4 ช่อง (รวมทั้งหมด, หนังสือภายใน, หนังสือภายนอก, มีไฟล์แนบ)
+    col_s1, col_s2, col_s3, col_s4 = st.columns(4)
     with col_s1:
         st.markdown(
             f"""
             <div class="stat-card">
                 <div class="stat-number">{total_docs}</div>
-                <div class="stat-label">📁 จำนวนครั้งที่สร้างทั้งหมด</div>
+                <div class="stat-label">📁 สร้างทั้งหมด</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -216,8 +222,8 @@ with tab2:
         st.markdown(
             f"""
             <div class="stat-card">
-                <div class="stat-number" style="color: #28a745;">{total_with_file}</div>
-                <div class="stat-label">🟢 มีการอัปโหลดไฟล์วิเคราะห์</div>
+                <div class="stat-number" style="color: #17a2b8;">{total_internal}</div>
+                <div class="stat-label">📥 หนังสือภายใน</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -226,26 +232,37 @@ with tab2:
         st.markdown(
             f"""
             <div class="stat-card">
-                <div class="stat-number" style="color: #dc3545;">{total_without_file}</div>
-                <div class="stat-label">🔴 สร้างจากข้อความอย่างเดียว</div>
+                <div class="stat-number" style="color: #6f42c1;">{total_external}</div>
+                <div class="stat-label">📤 หนังสือภายนอก</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_s4:
+        st.markdown(
+            f"""
+            <div class="stat-card">
+                <div class="stat-number" style="color: #28a745;">{total_with_file}</div>
+                <div class="stat-label">🟢 มีไฟล์วิเคราะห์</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
     st.markdown("---")
-    st.markdown("### 📋 ตารางประวัติรายการหนังสือ")
+    st.markdown("### 📋 ตารางประวัติรายการหนังสือ (บันทึกสะสมต่อเนื่อง)")
 
     if not st.session_state.history:
         st.info("📌 ยังไม่มีประวัติการสร้างหนังสือ ลองสร้างที่แท็บแรกก่อนครับ")
     else:
         dashboard_data = []
         for idx, item in enumerate(st.session_state.history, start=1):
-            status_badge = "🟢 มี (อัปโหลดแล้ว)" if item["has_file"] else "🔴 ไม่มี (ไม่ได้อัปโหลด)"
+            status_badge = "🟢 มี" if item["has_file"] else "🔴 ไม่มี"
             dashboard_data.append(
                 {
                     "ลำดับ": idx,
-                    "หัวเรื่องหนังสือที่ AI สร้างให้": item["subject"],
+                    "ประเภทหนังสือ": item["doc_type"],
+                    "หัวเรื่องหนังสือที่ AI สร้างให้ (ปกปิดส่วนราชการ)": item["subject"],
                     "สถานะอัพโหลดหนังสือให้วิเคราะห์เนื้อหา": status_badge,
                     "วันที่สร้าง": item["date"],
                 }
@@ -262,6 +279,7 @@ with tab2:
 
         if selected_index:
             selected_item = st.session_state.history[selected_index - 1]
+            st.markdown(f"**ประเภท:** {selected_item['doc_type']}")
             st.markdown(f"**หัวเรื่อง:** {selected_item['subject']}")
             st.markdown(f"**วันที่สร้าง:** {selected_item['date']}")
             st.code(selected_item["content"], language="markdown")
