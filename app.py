@@ -287,6 +287,6 @@ st.markdown("---")
 st.markdown("🛠️ **สร้างและพัฒนาโดย:** Admin Mine")
 
 with st.expander("ช่องทางติดต่อ: cool***@gmail.com (คลิกเพื่อดูอีเมลทั้งหมด)"):
-    full_email = "coolingpowder@gmail"
+    full_email = "coolingpowder@gmail.com"
     st.markdown(f"📧 **อีเมลติดต่อ:** `{full_email}`")
     st.markdown(f"🔗 [คลิกที่นี่เพื่อส่งอีเมลหาผู้พัฒนา](mailto:{full_email})")
